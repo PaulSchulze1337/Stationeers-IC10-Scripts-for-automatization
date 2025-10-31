@@ -1,0 +1,33 @@
+################################################################
+# Rocket fuel mixing script (66.6 % Volatile, 33.3 % Oxygen)
+# You have to name the devices as follows:
+# - MIXER_ROCKET: Mixer to mix the gases
+# - REGULATOR_ROCKET: Pressure regulator to limit the pressure in the canister
+# - ANALYSER_ROCKET: Analyser to read the pressure in the canister
+################################################################
+
+alias gasPressure r0
+define maxPressureCanister 8000 # 8 MPa
+define maxPressurePipe 30000 # 30 MPa
+
+main:
+yield # wait for 1 tick
+sbn 209854039 HASH("REGULATOR_ROCKET") On 1 # turn on pressure regulator
+sbn 435685051 HASH("ANALYSER_ROCKET") On 1 # turn on analyser
+
+sbn 2104106366 HASH("MIXER_ROCKET") Lock 1
+sbn 209854039 HASH("REGULATOR_ROCKET") Lock 1
+
+sbn 2104106366 HASH("MIXER_ROCKET") Setting 33.33333
+sbn 209854039 HASH("REGULATOR_ROCKET") Setting maxPressureCanister
+
+lbn gasPressure 435685051 HASH("ANALYSER_ROCKET") Pressure Average
+ble gasPressure maxPressurePipe startMixer # a <= b
+sbn 2104106366 HASH("MIXER_ROCKET") On 0 # turn off mixer
+j main
+
+
+startMixer:
+sbn 2104106366 HASH("MIXER_ROCKET") On 1 # turn on mixer
+j main
+

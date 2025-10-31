@@ -1,0 +1,53 @@
+##################################################################
+# Collection oxigen from Europa's atmosphere using a active vent #
+# and a pipe heater to warmup the gas to prevent condensation in #
+# the pipe.                                                      #
+##################################################################
+# The following points are critical. Keep temp higher than:
+# 57 K @ 6.3 kPa
+# 100 K @ 254 kPa
+# 110 K @ 470 kPa
+# 124 K @ 1000 kPa
+# 137 K @ 2000 kPa
+# > 165 K @ infinite pressure
+##################################################################
+
+define maxTemp 293 #K / max temp to heat the gas (0 C)
+define maxPressure 20000 #kPa / max pressure of pipe system
+alias currentTemp r0
+alias currentPressure r1
+
+main:
+yield # wait for 1 tick
+sbn 435685051 HASH("ANALYSER_OXIGEN") On 1 # ensure heater is on
+lbn currentTemp 435685051 HASH("ANALYSER_OXIGEN") Temperature Average # read temp
+lbn currentPressure 435685051 HASH("ANALYSER_OXIGEN") Pressure Average # read pressure
+round currentTemp currentTemp
+round currentPressure currentPressure
+sbn -1129453144 HASH("VENT_OXIGEN") PressureInternal maxPressure # set vent internal press
+sbn -1129453144 HASH("VENT_OXIGEN") Mode 1 # set vent to Inward
+s db Setting currentTemp # display current temp on display
+# heating as long as temp is below maxTemp
+bleal currentTemp maxTemp startHeater # a <= b
+bgtal currentTemp maxTemp stopHeater # a > b
+# cut off if temp is to low
+bgt currentPressure maxPressure stopVent # a > b
+ble currentTemp 260 stopVent  # a <= b
+bgt currentTemp 260 startVent # a > b
+j main
+
+startHeater:
+sbn -419758574 HASH("PIPE_HEATER") On 1 # turn on pipe heater
+j ra # jump back to main loop
+
+stopHeater:
+sbn -419758574 HASH("PIPE_HEATER") On 0 # turn off pipe heater
+j ra # jump back to main loop
+
+startVent:
+sbn -1129453144 HASH("VENT_OXIGEN") On 1 # turns vent on
+j main
+
+stopVent:
+sbn -1129453144 HASH("VENT_OXIGEN") On 0 # turns vent off
+j main

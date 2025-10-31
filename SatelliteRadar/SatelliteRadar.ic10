@@ -8,6 +8,7 @@ alias horizontal r0
 alias vertical r1
 
 loop:
+yield
 l horizontal dialHorizontal Setting
 l vertical dialVertical Setting
 #s db Setting horizontal
