@@ -1,0 +1,55 @@
+##########################################################################################
+# Script to automatically control Suit filtration, A/C and pressure states.
+# A/C and Pressure are always on when helmet is closed.
+# Filtration is controlled based on CO2 Levels.
+# Everything is deactivated when helmet is open.
+##########################################################################################
+alias suit db # db refers to the suit
+alias helmet d0
+alias jetpack d1
+
+alias helmetState r0
+alias carbonDioxidRatio r1
+alias targetTemp r2
+
+define TARGETPRESSURE 100 #kPa (100 kPa = 1 bar)
+# SET TARGET TEMP TO YOUR PREFERED VALUE
+define TARGETTEMP 5 # degrees Celsius
+add targetTemp TARGETTEMP 273.15 #Convert to Kelvin
+
+main:
+yield
+# prevent user from changing targetPressure and targetTemp while script is running
+s suit PressureSetting TARGETPRESSURE
+s suit TemperatureSetting targetTemp
+# read current CO2 ratio and helmet state
+l carbonDioxidRatio suit RatioCarbonDioxide
+# read current state of the helmet. # 1 = Open, 0 = Closed
+l helmetState helmet Open
+
+beqal helmetState 1 deactivateAll # a == 1
+beqzal helmetState activateACandPressure # a == 0
+bgeal carbonDioxidRatio 0.60 startFiltation # a >= b
+bltal carbonDioxidRatio 0.10 stopFiltation  # a < b
+j main
+
+
+deactivateAll:
+s suit On 0
+s suit AirRelease 0
+s suit Filtration 0
+j ra
+
+activateACandPressure:
+s suit On 1
+s suit AirRelease 1
+j ra
+
+startFiltation:
+s suit Filtration 1
+j ra
+
+stopFiltation:
+s suit Filtration 0
+j ra
+#EOF
