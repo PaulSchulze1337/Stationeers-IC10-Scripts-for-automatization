@@ -1,0 +1,89 @@
+##################################################################
+# Controlls the atmospheric in one room. Air will be refreshed   #
+# automatically depending on concentration of air components     #
+##################################################################
+# One routine will automatically suck air out of the room if the #
+# pressure is to high.
+# Another routine will fill the room with fresh slowly add each  #
+# component one by one until the target concentration is reached.#
+##################################################################
+# VENT_GREENHOUSE
+# AIR_SENSOR_GREENHOUSE
+# PUMP_CO2
+# PUMP_NITROGEN
+# PUMP_OXYGEN
+##################################################################
+# ABSOLUT MINIMUS CONDITIONS TO KEEP and PLAYER ALIVE:
+# 16 KPa of Pressure with 12 KPa OXYGEN
+##################################################################
+define MAXPRESSURE 100 # kPa
+define MINPRESSURE  80 # kPa
+define MINO2 0.18
+define MINCO2 0.02
+
+alias currentRoomPressure r0
+alias currentO2 r1
+alias currentCO2 r2
+alias targetPressure r5
+
+main:
+yield
+lbn currentRoomPressure -1252983604 HASH("AIR_SENSOR_GREENHOUSE") Pressure Average # read pressure
+sbn -1129453144 HASH("VENT_GREENHOUSE") PressureInternal 50000 # set vent internal press
+sbn -1129453144 HASH("VENT_GREENHOUSE") Mode 1 # set vent to Inward
+bgt currentRoomPressure MAXPRESSURE startVent # a > b
+bleal currentRoomPressure MINPRESSURE stopVent  # a <= b
+# Cut off if pressure is too high. There must be a failure in the filtration system
+bgt currentRoomPressure MAXPRESSURE main  # a > b
+sleep 5
+lbn currentO2 -1252983604 HASH("AIR_SENSOR_GREENHOUSE") RatioOxygen Average # read O2
+s db Setting currentO2 # show on IC
+blt currentO2 MINO2 pulseO2 # a < b
+lbn currentCO2 -1252983604 HASH("AIR_SENSOR_GREENHOUSE") RatioCarbonDioxide Average # read CO2
+blt currentCO2 MINCO2 pulseCO2 # a < b
+lbn currentRoomPressure -1252983604 HASH("AIR_SENSOR_GREENHOUSE") Pressure Average # read pressure
+# fill up N2 till Pressure is 10 kPa below MAX_PRESSURE
+sub targetPressure MAXPRESSURE 10
+blt currentRoomPressure targetPressure pulseN2 # a < b
+j main
+
+pulseO2:
+sbn -321403609 HASH("PUMP_OXYGEN") Setting 10 # set pump to 1 l/s
+sbn -321403609 HASH("PUMP_OXYGEN") On 1 # turn on
+sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
+sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
+sleep 2
+sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
+j main
+
+pulseCO2:
+sbn -321403609 HASH("PUMP_CO2") Setting 10 # set pump to 1 l/s
+sbn -321403609 HASH("PUMP_CO2") On 1 # turn on
+sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
+sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
+sleep 5
+sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
+j main
+
+pulseN2:
+sbn -321403609 HASH("PUMP_NITROGEN") Setting 10 # set pump to 1 l/s
+sbn -321403609 HASH("PUMP_NITROGEN") On 1 # turn on N2 pump
+sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
+sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
+sleep 5
+sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off N2 pump
+j main
+
+startVent:
+sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
+sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
+sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
+sbn -1129453144 HASH("VENT_OXIGEN") On 1 # turns vent on
+j main
+
+stopVent:
+sbn -1129453144 HASH("VENT_OXIGEN") On 0 # turns vent off
+sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
+sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
+sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
+j ra #just back
