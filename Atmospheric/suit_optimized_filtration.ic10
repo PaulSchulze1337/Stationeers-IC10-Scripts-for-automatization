@@ -29,8 +29,8 @@ l helmetState helmet Open
 
 beqal helmetState 1 deactivateAll # a == 1
 beqzal helmetState activateACandPressure # a == 0
-bgeal carbonDioxidRatio 0.60 startFiltation # a >= b
-bltal carbonDioxidRatio 0.10 stopFiltation  # a < b
+bgeal carbonDioxidRatio 0.40 startFiltation # a >= b
+bltal carbonDioxidRatio 0.05 stopFiltation  # a < b
 j main
 
 

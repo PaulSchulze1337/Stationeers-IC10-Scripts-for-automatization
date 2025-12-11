@@ -9,7 +9,7 @@ alias inputPressure r0
 alias filter0Remains r1
 alias filter1Remains r2
 #
-define MINPRESSURE 1000 # 1MPa, minimum pressure to start filtering
+define MINPRESSURE 0.01 # KPa, minimum pressure to start filtering
 ##########################################################################################
 
 main:
@@ -19,8 +19,8 @@ ls filter0Remains filterUnit 0 Quantity # 0 = Gas Filter A
 ls filter1Remains filterUnit 1 Quantity # 1 = Gas Filter B
 
 ### cut of filtering if the filters are nearly empty
-bleal filter0Remains 5 stopFilteringCutOff
-bleal filter1Remains 5 stopFilteringCutOff
+bleal filter0Remains 2 stopFilteringCutOff
+bleal filter1Remains 2 stopFilteringCutOff
 
 bleal inputPressure MINPRESSURE stopFiltering
 bgtal inputPressure MINPRESSURE startFiltering

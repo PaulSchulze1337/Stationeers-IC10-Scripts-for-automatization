@@ -1,0 +1,38 @@
+##################################################################
+# Increses the pressure of a given pipenetwork to a target value
+# using a pump.
+# It's recommended to install some inline tanks for pressure
+# stabilization / buffering.
+##################################################################
+# PUMP_CANISTER
+# ANALYSER_CANISTER_PIPE
+# PRESSURE_CANISTER_DISPLAY
+##################################################################
+define maxTargetPressure 7000 # KPa = 7MPa (10.1 MPa burst pressure of canisters)
+alias currentPressure r0 # current pipe pressure
+
+
+main:
+yield
+sbn 435685051 HASH("ANALYSER_CANISTER_PIPE") On 1 # turn on analyser
+lbn currentPressure 435685051 HASH("ANALYSER_CANISTER_PIPE") Pressure Average # read pressure
+round currentPressure currentPressure
+
+sbn -815193061 HASH("PRESSURE_CANISTER_DISPLAY") Setting currentPressure
+sbn -53151617 HASH("PRESSURE_CANISTER_DISPLAY") Setting currentPressure
+sbn -1949054743 HASH("PRESSURE_CANISTER_DISPLAY") Setting currentPressure
+
+bgt currentPressure maxTargetPressure stopPump # a > b
+#bleal currentPressure maxTargetPressure startPump # a <= b
+j startPump
+
+j main
+
+startPump:
+sbn -321403609 HASH("PUMP_CANISTER") Setting 10 # set pump to 10 l/s
+sbn -321403609 HASH("PUMP_CANISTER") On 1 # turn on
+j main
+
+stopPump:
+sbn -321403609 HASH("PUMP_CANISTER") On 0 # turn off
+j main
