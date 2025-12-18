@@ -1,0 +1,44 @@
+##################################################
+# Calculates current chargeing state of all
+# station batteries of one type (normal or large).
+# Charging state is transmit via logic transmitter.
+# You have to set logic transmitter to active.
+##################################################
+alias logicTransmitter d0
+alias display d1 #just for a local displaying
+
+alias currentEnergy0 r0   # small batteries
+alias currentEnergy1 r1   # large batteries
+alias currentEnergySum r2 # all batteries
+alias maximumEnergy0 r3   # small batteries
+alias maximumEnergy1 r4   # large batteries
+alias maximumEnergySum r5 # all batteries
+
+define batteryHash0 -400115994 #station battery
+define batteryHash1 -1388288459 #station battery L
+alias batteryCharge r6
+
+##programm##
+main:
+yield
+#read out maximum capacity of batteries
+lb maximumEnergy0 batteryHash0 Maximum Sum
+lb maximumEnergy1 batteryHash1 Maximum Sum
+add maximumEnergySum maximumEnergy0 maximumEnergy1
+
+#read out current charing state of batteries
+lb currentEnergy0 batteryHash0 Charge Sum
+lb currentEnergy1 batteryHash1 Charge Sum
+add currentEnergySum currentEnergy0 currentEnergy1
+
+# calculate current state in percent
+div batteryCharge currentEnergySum maximumEnergySum
+mul batteryCharge batteryCharge 100
+round batteryCharge batteryCharge
+
+# displays surrent batteryCharge on a local display
+s db Setting batteryCharge
+s display Setting batteryCharge
+# sent surrent batteryCharge via logic transmitter
+s logicTransmitter Setting batteryCharge
+j main

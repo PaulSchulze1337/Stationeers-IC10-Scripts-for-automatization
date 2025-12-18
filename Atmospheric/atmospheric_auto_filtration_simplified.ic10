@@ -16,45 +16,32 @@
 # ABSOLUT MINIMUS CONDITIONS TO KEEP and PLAYER ALIVE:
 # 16 KPa of Pressure with 12 KPa OXYGEN
 ##################################################################
-# Target partial pressure of O2 = 22 kPa
-#
-#
-define nameVent HASH("VENT_HABITAT")
-define nameAirSensor HASH("AIR_SENSOR_HABITAT")
-#
 define MAXPRESSURE 100 # kPa
 define MINPRESSURE  80 # kPa
-define TARGETO2PRESSURE 21 # kPa (this is partial pressure)
 define MINO2 0.20
 define MINCO2 0.00
-#
+
 alias currentRoomPressure r0
 alias currentO2 r1
 alias currentCO2 r2
-alias targetO2Ratio r3
 alias targetPressure r5
-#
+
 main:
 yield
-lbn currentRoomPressure -1252983604 nameAirSensor Pressure Average # read pressure
-sbn -1129453144 nameVent PressureInternal 50000 # set vent internal press
-sbn -1129453144 nameVent Mode 1 # set vent to Inward
-### calculate needed ratio for O2 (it depends on current pressure)
-div targetO2Ratio TARGETO2PRESSURE currentRoomPressure
-s db Setting targetO2Ratio # show on IC
-# Vent room if pressure exeeds MAXPRESSURE
+lbn currentRoomPressure -1252983604 HASH("AIR_SENSOR_WORKSHOP") Pressure Average # read pressure
+sbn -1129453144 HASH("VENT_WORKSHOP") PressureInternal 50000 # set vent internal press
+sbn -1129453144 HASH("VENT_WORKSHOP") Mode 1 # set vent to Inward
+s db Setting currentRoomPressure # show on IC
 bgt currentRoomPressure MAXPRESSURE startVent # a > b
 bleal currentRoomPressure MINPRESSURE stopVent  # a <= b
-# Cut off here if pressure is too high. There must be a failure in the filtration system
+# Cut off if pressure is too high. There must be a failure in the filtration system
 bgt currentRoomPressure MAXPRESSURE main  # a > b
 sleep 5
-# check which gas needs to be pumped in
-lbn currentO2 -1252983604 nameAirSensor RatioOxygen Average # read O2
-blt currentO2 targetO2Ratio pulseO2 # a < b
-#blt currentO2 MINO2 pulseO2 # a < b
-lbn currentCO2 -1252983604 nameAirSensor RatioCarbonDioxide Average # read CO2
+lbn currentO2 -1252983604 HASH("AIR_SENSOR_WORKSHOP") RatioOxygen Average # read O2
+blt currentO2 MINO2 pulseO2 # a < b
+lbn currentCO2 -1252983604 HASH("AIR_SENSOR_WORKSHOP") RatioCarbonDioxide Average # read CO2
 blt currentCO2 MINCO2 pulseCO2 # a < b
-lbn currentRoomPressure -1252983604 nameAirSensor Pressure Average # read pressure
+lbn currentRoomPressure -1252983604 HASH("AIR_SENSOR_WORKSHOP") Pressure Average # read pressure
 # fill up N2 till Pressure is 10 kPa below MAX_PRESSURE
 sub targetPressure MAXPRESSURE 10
 blt currentRoomPressure targetPressure pulseN2 # a < b
@@ -65,7 +52,7 @@ sbn -321403609 HASH("PUMP_OXYGEN") Setting 10 # set pump to 1 l/s
 sbn -321403609 HASH("PUMP_OXYGEN") On 1 # turn on
 sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
 sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
-sleep 5
+sleep 2
 sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
 j main
 
@@ -91,11 +78,11 @@ startVent:
 sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
 sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
 sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
-sbn -1129453144 nameVent On 1 # turns vent on
+sbn -1129453144 HASH("VENT_WORKSHOP") On 1 # turns vent on
 j main
 
 stopVent:
-sbn -1129453144 nameVent On 0 # turns vent off
+sbn -1129453144 HASH("VENT_WORKSHOP") On 0 # turns vent off
 sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
 sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
 sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off

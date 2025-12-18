@@ -19,29 +19,32 @@
 # Target partial pressure of O2 = 22 kPa
 #
 #
-define nameVent HASH("VENT_HABITAT")
-define nameAirSensor HASH("AIR_SENSOR_HABITAT")
-#
+define nameVent HASH("VENT_GREENHOUSE")
+define nameAirSensor HASH("AIR_SENSOR_GREENHOUSE")
+
 define MAXPRESSURE 100 # kPa
 define MINPRESSURE  80 # kPa
 define TARGETO2PRESSURE 21 # kPa (this is partial pressure)
 define MINO2 0.20
-define MINCO2 0.00
-#
+define MINCO2 0.04
+define MINN2 0.05
+
 alias currentRoomPressure r0
 alias currentO2 r1
 alias currentCO2 r2
-alias targetO2Ratio r3
+alias currentN2 r3
+alias targetO2Ratio r4
 alias targetPressure r5
-#
+
 main:
 yield
 lbn currentRoomPressure -1252983604 nameAirSensor Pressure Average # read pressure
+s db Setting currentRoomPressure # show on IC
 sbn -1129453144 nameVent PressureInternal 50000 # set vent internal press
 sbn -1129453144 nameVent Mode 1 # set vent to Inward
 ### calculate needed ratio for O2 (it depends on current pressure)
 div targetO2Ratio TARGETO2PRESSURE currentRoomPressure
-s db Setting targetO2Ratio # show on IC
+#s db Setting targetO2Ratio # show on IC
 # Vent room if pressure exeeds MAXPRESSURE
 bgt currentRoomPressure MAXPRESSURE startVent # a > b
 bleal currentRoomPressure MINPRESSURE stopVent  # a <= b
@@ -54,6 +57,8 @@ blt currentO2 targetO2Ratio pulseO2 # a < b
 #blt currentO2 MINO2 pulseO2 # a < b
 lbn currentCO2 -1252983604 nameAirSensor RatioCarbonDioxide Average # read CO2
 blt currentCO2 MINCO2 pulseCO2 # a < b
+lbn currentN2 -1252983604 nameAirSensor RatioNitrogen Average # read N2
+blt currentN2 MINN2 pulseN2 # a < b
 lbn currentRoomPressure -1252983604 nameAirSensor Pressure Average # read pressure
 # fill up N2 till Pressure is 10 kPa below MAX_PRESSURE
 sub targetPressure MAXPRESSURE 10

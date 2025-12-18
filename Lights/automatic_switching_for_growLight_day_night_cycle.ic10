@@ -6,30 +6,43 @@
 #          sunrise (90°)
 ##########################################################################################
 ## SETUP ##
-alias solarSensor d0 # (for SolarAngle detec.)
-# Hashes for lights for batch write later
 define growLightshash -1758710260
+define solarSensorHash 1076425094
+define displayHash -815193061
 # Variables
 alias verticalSunAngle r0 # vertical deg of sol
+alias horizontalSunAngle r1 # horizontal deg of sol
+
+define nameSensor HASH("SOL_SENSOR")
+define nameDisplayHorizonal HASH("HORIZONTAL")
+define nameDisplayVertical HASH("VERTICAL")
 ##########################################################################################
-automaticGrowLightSwitching:
+main:
 yield # wait for 1 tick
-# determine state of day by the vertical angle of solar sensor
-# if vertical angle is <= 90 deg, then it is day (otherwise it is night)
-l verticalSunAngle solarSensor Vertical
-s db Setting verticalSunAngle # FOR DEBUG: Write current vertical angle to housing
-bgeal verticalSunAngle 90 turnLightsOff # if vertical angle >= 90, then it is night
-bltal verticalSunAngle 90 turnLightsOn # if vertical angle < 90, then it is day
-j automaticGrowLightSwitching
+lbn verticalSunAngle solarSensorHash nameSensor Vertical Average # read
+lbn horizontalSunAngle solarSensorHash nameSensor Horizontal Average # read
+
+s db Setting horizontalSunAngle # FOR DEBUG: Write current horizontal angle to housing
+
+sbn displayHash nameDisplayVertical Setting verticalSunAngle # show vertical angle on display
+sbn displayHash nameDisplayHorizonal Setting horizontalSunAngle # show horizontal angle on display
+
+# It's day when the horizontal above -90 deg to 0 deg and from 0 deg to 90 deg
+# It's night when the horizontal is below -90 deg or above 90 deg
+bge horizontalSunAngle 90 itsnight # if horizontal angle > 90, then it is night
+ble horizontalSunAngle -90 itsnight # if horizontal angle < -90, then it is night
+
+# from here we know that horizontal angle is between -90 and 90 deg and it is day
+j itsday
+# save guard
+j main
 
 
-turnLightsOn:
-sb growLightshash On 1 #for all lights
-j ra # jump back where we came from
+itsnight:
+sb growLightshash On 0 # turn all lights off
+j main # jump back where we came from
 
-
-turnLightsOff:
-sb growLightshash On 0 #for all lights
-j ra # jump back where we came from
-
+itsday:
+sb growLightshash On 1 # turn all lights on
+j main # jump back where we came from
 # EOF
