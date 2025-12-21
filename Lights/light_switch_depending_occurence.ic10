@@ -1,0 +1,38 @@
+##################################################################
+# Switches on all lights, when a player is inside a room
+##################################################################
+# OCCURENCE_KITCHEN
+################################################
+
+alias numberOfPlayersDetected r0
+define nameSensor HASH("OCCURENCE_KITCHEN")
+
+
+main:
+yield
+lbn numberOfPlayersDetected 322782515 nameSensor Quantity Average
+s db Setting numberOfPlayersDetected
+bgez numberOfPlayersDetected switchOnAllLights
+
+j switchOffAllLights
+# fallback
+j main
+
+
+switchOnAllLights:
+
+sb 797794350 On 1 # turn all lights of this type on
+sb 1847265835 On 1 # turn all lights of this type on
+sb 555215790 On 1 # turn all lights of this type on
+sb -1860064656 On 1 # turn all lights of this type on
+sb 1944485013 On 1 # turn all lights of this type on
+j main
+
+
+switchOffAllLights:
+sb 797794350 On 0 # turn all lights of this type off
+sb 1847265835 On 0 # turn all lights of this type off
+sb 555215790 On 0 # turn all lights of this type off
+sb -1860064656 On 0 # turn all lights of this type off
+sb 1944485013 On 0 # turn all lights of this type off
+j main
