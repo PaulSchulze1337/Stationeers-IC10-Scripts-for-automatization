@@ -5,34 +5,49 @@
 ################################################
 
 alias numberOfPlayersDetected r0
-define nameSensor HASH("OCCURENCE_KITCHEN")
+define nameSensor HASH("OCCURENCE_GREENHOUSE")
 
 
 main:
 yield
 lbn numberOfPlayersDetected 322782515 nameSensor Quantity Average
-s db Setting numberOfPlayersDetected
-bgez numberOfPlayersDetected switchOnAllLights
+#s db Setting numberOfPlayersDetected
+bgt numberOfPlayersDetected 0 switchOnAll
 
-j switchOffAllLights
+j switchOffAll
 # fallback
 j main
 
 
-switchOnAllLights:
-
+switchOnAll:
 sb 797794350 On 1 # turn all lights of this type on
 sb 1847265835 On 1 # turn all lights of this type on
 sb 555215790 On 1 # turn all lights of this type on
 sb -1860064656 On 1 # turn all lights of this type on
 sb 1944485013 On 1 # turn all lights of this type on
+sb 1514476632 On 1 # turn all lights of this type on
+sb 1436121888 On 1 # turn all lights of this type on
+sb 1592905386 On 1 # turn all lights of this type on
+sb -1860064656 On 1 # turn all lights of this type on
+###
+sb -815193061 On 1  # turn all displays on
+sb -53151617 On 1   # turn all displays on
+sb -1949054743 On 1 # turn all displays on
 j main
 
-
-switchOffAllLights:
+switchOffAll:
 sb 797794350 On 0 # turn all lights of this type off
 sb 1847265835 On 0 # turn all lights of this type off
 sb 555215790 On 0 # turn all lights of this type off
 sb -1860064656 On 0 # turn all lights of this type off
 sb 1944485013 On 0 # turn all lights of this type off
+sb 1514476632 On 0 # turn all lights of this type off
+sb 1436121888 On 0 # turn all lights of this type off
+sb 1592905386 On 0 # turn all lights of this type off
+sb -1860064656 On 0 # turn all lights of this type off
+###
+sb -815193061 On 0  # turn all displays of this type off
+sb -53151617 On 0   # turn all displays of this type off
+sb -1949054743 On 0 # turn all displays of this type off
 j main
+

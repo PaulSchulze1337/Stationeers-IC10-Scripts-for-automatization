@@ -1,0 +1,27 @@
+##################################################################
+# Controlls a canister filler with a pump. The pump will start   #
+# when the cannister is installed and the pressure is below the  #
+# threshold value.                                               #
+##################################################################
+# NITROGEN_FILLER
+# NITROGEN_PUMP
+##################################################################
+
+alias currentCanisterPressure r0
+alias currentCanisterVolume r1
+
+
+main:
+yield
+lbns currentCanisterPressure 1691898022 HASH("NITROGEN_FILLER") 0 Pressure Average
+lbns currentCanisterVolume 1691898022 HASH("NITROGEN_FILLER") 0 Quantity Average
+s db Setting currentCanisterVolume # show on IC
+j main
+
+
+startFilling:
+j main
+
+
+stopFilling:
+j main

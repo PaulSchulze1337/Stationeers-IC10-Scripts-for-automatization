@@ -2,22 +2,22 @@
 # we receive a numberous values via logic trans-
 # mitter and displaying this value onto a display
 #################################################
-##config##
-alias display d0
-alias logicTransmitter d1
-##variables##
-# value to display is transmitted via logic trans-
-# mitter. It can be any number
+# INPUT (Logic Transmitter)
+# OUTPUT (Display)
+#################################################
+define nameOutputDisplay HASH("WIND_BATTERY_CHARGE")
+define nameTransmitter HASH("WIND_BATTERY_RX")
+
+define displayHash -815193061 #small display
+define transmitterHash -693235651 #logic transmitter
+
 alias valueToDisplay r0
 
-##program##
-main:
-yield # wait for 0.5 sek.
 
-# loading value from logic transmitter.
-# in this case we are displaying battery state
-l valueToDisplay logicTransmitter Setting
-# writing value into display
-s display Setting batteryState
+main:
+yield
+lbn valueToDisplay transmitterHash nameTransmitter Setting Average
+sbn displayHash nameOutputDisplay Mode 1 # show on display
+sbn displayHash nameOutputDisplay Setting valueToDisplay # show on display
 
 j main

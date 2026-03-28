@@ -15,10 +15,12 @@ define nameChargeDisplay HASH("CHARGE")
 define nameOutputDisplay HASH("OUTPUT")
 define nameInputCable HASH("INPUT_CABLE")
 define nameOutputCable HASH("OUTPUT_CABLE")
+define nameTransmitter HASH("BAT_TRANSMITTER")
 ################################################
 define batteryHashM -400115994 #station battery
 define batteryHashL -1388288459 #station battery L
-define displayHash -815193061 #logic display
+define displayHash -815193061 #small display
+define transmitterHash -693235651 #logic transmitter
 ################################################
 alias inputPowerActual r0
 alias outputPowerActual r1
@@ -50,7 +52,6 @@ div batteryCharge currentCharge maxCapacity
 
 sbn displayHash nameChargeDisplay Mode 1 # show on cable analyser
 sbn displayHash nameChargeDisplay Setting batteryCharge # show on display
-
-
+sbn transmitterHash nameTransmitter Setting batteryCharge # send over transmitter
 
 j main

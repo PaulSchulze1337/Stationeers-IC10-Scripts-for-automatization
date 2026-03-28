@@ -25,7 +25,6 @@ define nameAirSensor HASH("AIR_SENSOR_HABITAT")
 define MAXPRESSURE 100 # kPa
 define MINPRESSURE  80 # kPa
 define TARGETO2PRESSURE 21 # kPa (this is partial pressure)
-define MINO2 0.20
 define MINCO2 0.00
 #
 alias currentRoomPressure r0
