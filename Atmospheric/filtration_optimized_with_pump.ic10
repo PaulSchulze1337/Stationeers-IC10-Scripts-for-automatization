@@ -38,7 +38,6 @@ sbn 435685051 HASH("ANALYSER_EXHAUST") On 1 # ensure analyser is on
 
 ### cut of filtering if both remaining filters are too low
 ble filterRemains 2 stopFilteringCutOff # a <= b
-#ble filter1Remains 2 stopFilteringCutOff # a <= b
 ### cut of filtering if output pressure is too high
 bgt outputPressure1 MAXPRESSURE stopFilteringCutOff # a > b
 bgt outputPressure2 MAXPRESSURE stopFilteringCutOff # (not needed here)
