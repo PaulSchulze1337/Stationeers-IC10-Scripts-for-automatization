@@ -1,0 +1,64 @@
+##########################################################################################
+# This Script is querying all named filtrations units for their filter remains and if one
+# of them is below a threshhold it will trigger an alarm to indicate an imminent failure
+# of the filtration system.
+##########################################################################################
+# Names for devices (name them with labeler)
+# FILTRATION_OXYGEN
+# FILTRATION_CO2
+# FILTRATION_NITROGEN
+# FILTRATION_POLLUTANTS
+
+alias tempValue r0
+alias filterRemainsOxygen r1
+alias filterRemainsCO2 r2
+alias filterRemainsNitrogen r3
+alias filterRemainsExhaust r4
+alias lowestFilterRemains r5
+
+define WARNINGTRESHHOLD 10 # 10% of filter remains
+
+
+
+main:
+yield
+move tempValue 0
+lbns filterRemainsOxygen -348054045 HASH("FILTRATION_OXYGEN") 0 Quantity Average
+add filterRemainsOxygen filterRemainsOxygen tempValue
+lbns tempValue -348054045 HASH("FILTRATION_OXYGEN") 1 Quantity Average
+add filterRemainsOxygen filterRemainsOxygen tempValue
+ble filterRemainsOxygen WARNINGTRESHHOLD startAlarmAndReturn # a <= b
+
+move tempValue 0
+lbns filterRemainsCO2 -348054045 HASH("FILTRATION_CO2") 0 Quantity Average
+add filterRemainsCO2 filterRemainsCO2 tempValue
+lbns tempValue -348054045 HASH("FILTRATION_CO2") 1 Quantity Average
+add filterRemainsCO2 filterRemainsCO2 tempValue
+ble filterRemainsCO2 WARNINGTRESHHOLD startAlarmAndReturn # a <= b
+
+move tempValue 0
+lbns filterRemainsNitrogen -348054045 HASH("FILTRATION_NITROGEN") 0 Quantity Average
+add filterRemainsNitrogen filterRemainsNitrogen tempValue
+lbns tempValue -348054045 HASH("FILTRATION_NITROGEN") 1 Quantity Average
+add filterRemainsNitrogen filterRemainsNitrogen tempValue
+ble filterRemainsNitrogen WARNINGTRESHHOLD startAlarmAndReturn # a <= b
+
+move tempValue 0
+lbns filterRemainsExhaust -348054045 HASH("FILTRATION_POLLUTANTS") 0 Quantity Average
+add filterRemainsExhaust filterRemainsExhaust tempValue
+lbns tempValue -348054045 HASH("FILTRATION_POLLUTANTS") 1 Quantity Average
+add filterRemainsExhaust filterRemainsExhaust tempValue
+ble filterRemainsExhaust WARNINGTRESHHOLD startAlarmAndReturn # a <= b
+
+j stopAlarmAndReturn
+j main
+
+# -1535893860
+startAlarmAndReturn:
+sbn -1535893860 HASH("ALARM_FILTRATION") On 1 # turn on alarm
+sleep 5
+j main
+
+stopAlarmAndReturn:
+sbn -1535893860 HASH("ALARM_FILTRATION") On 0 #
+j main

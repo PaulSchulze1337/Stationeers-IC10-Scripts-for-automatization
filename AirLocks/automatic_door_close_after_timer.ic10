@@ -1,0 +1,21 @@
+##########################################################################################
+# This script closes a Glass Door after a certain time after it was opend.
+##########################################################################################
+# Names for devices (name them with labeler)
+# AUTOMATIC_DOOR
+##########################################################################################
+
+define doorName HASH("AUTOMATIC_DOOR")
+alias doorState r2
+
+main:
+lbn doorState -324331872 doorName Open Average
+beqz doorState main  # a == 0, door is closed, do nothing
+beq doorState 1 startCloseTimer # a == 1
+j main
+
+
+startCloseTimer:
+sleep 2
+sbn -324331872 doorName Open 0 # close door
+j main
