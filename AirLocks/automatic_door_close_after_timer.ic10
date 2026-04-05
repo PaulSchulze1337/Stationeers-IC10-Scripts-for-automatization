@@ -16,6 +16,8 @@ j main
 
 
 startCloseTimer:
-sleep 2
+sbn -324331872 doorName Lock 1 # lock door
+sleep 1
 sbn -324331872 doorName Open 0 # close door
+sbn -324331872 doorName Lock 0 # unlock door
 j main
