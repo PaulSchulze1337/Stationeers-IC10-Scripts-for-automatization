@@ -1,0 +1,45 @@
+##########################################################################################
+# This script closes a Glass Door after a certain time after it was opend.
+##########################################################################################
+# Names for devices (name them with labeler)
+# AUTOMATIC_DOOR
+##########################################################################################
+define doorName1 HASH("AUTOMATIC_DOOR_1")
+define doorName2 HASH("AUTOMATIC_DOOR_2")
+define doorName3 HASH("AUTOMATIC_DOOR_3")
+define doorHash -324331872 # Glass Door
+alias doorState1 r0
+alias doorState2 r1
+alias doorState3 r2
+
+
+main:
+lbn doorState1 doorHash doorName1 Open Average
+lbn doorState2 doorHash doorName2 Open Average
+lbn doorState3 doorHash doorName3 Open Average
+beqal doorState1 1 startCloseTimer1 # a == 1
+beqal doorState2 1 startCloseTimer2 # a == 1
+beqal doorState3 1 startCloseTimer3 # a == 1
+j main
+
+
+startCloseTimer1:
+sbn doorHash doorName1 Lock 1 # lock door
+sleep 1
+sbn doorHash doorName1 Open 0 # close door
+sbn doorHash doorName1 Lock 0 # unlock door
+j ra
+
+startCloseTimer2:
+sbn doorHash doorName2 Lock 1 # lock door
+sleep 1
+sbn doorHash doorName2 Open 0 # close door
+sbn doorHash doorName2 Lock 0 # unlock door
+j ra
+
+startCloseTimer3:
+sbn doorHash doorName3 Lock 1 # lock door
+sleep 1
+sbn doorHash doorName3 Open 0 # close door
+sbn doorHash doorName3 Lock 0 # unlock door
+j ra

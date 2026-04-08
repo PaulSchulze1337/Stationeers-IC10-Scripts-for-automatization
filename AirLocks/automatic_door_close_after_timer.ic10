@@ -6,18 +6,19 @@
 ##########################################################################################
 
 define doorName HASH("AUTOMATIC_DOOR")
+define doorHash -324331872 # Glass Door
 alias doorState r2
 
 main:
-lbn doorState -324331872 doorName Open Average
+lbn doorState doorHash doorName Open Average
 beqz doorState main  # a == 0, door is closed, do nothing
 beq doorState 1 startCloseTimer # a == 1
 j main
 
 
 startCloseTimer:
-sbn -324331872 doorName Lock 1 # lock door
+sbn doorHash doorName Lock 1 # lock door
 sleep 1
-sbn -324331872 doorName Open 0 # close door
-sbn -324331872 doorName Lock 0 # unlock door
+sbn doorHash doorName Open 0 # close door
+sbn doorHash doorName Lock 0 # unlock door
 j main

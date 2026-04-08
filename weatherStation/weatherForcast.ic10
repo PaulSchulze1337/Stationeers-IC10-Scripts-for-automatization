@@ -16,8 +16,9 @@ define speakerHash -828056979 #Klaxon speaker hash
 sb speakerHash Mode 0 #for alarm
 sb speakerHash On 0
 ##################################################
+
 loop:
-yield # pauses for 0.5 seconds
+yield
 sb speakerHash Volume 100 # 100 = max
 # load button state for debugging
 #l activateBtn debugButton Setting #uncomment this
