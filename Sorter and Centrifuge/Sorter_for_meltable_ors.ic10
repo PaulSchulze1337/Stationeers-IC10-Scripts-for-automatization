@@ -22,18 +22,18 @@ j main
 
 processingS1:
 lbns itemHash sorterHash nameSorterS1 0 OccupantHash Maximum
-beq itemHash  -707307845 outputRightS1 #copper ore
-beq itemHash -1348105509 outputRightS1 #gold ore
-beq itemHash  1758427767 outputRightS1 #iron ore
-beq itemHash  -190236170 outputRightS1 #lead ore
-beq itemHash  1830218956 outputRightS1 #nickel ore
-beq itemHash  1103972403 outputRightS1 #silicon ore
-beq itemHash  -916518678 outputRightS1 #silver ore
+beq itemHash  -707307845 ejectOnRightS1 #copper ore
+beq itemHash -1348105509 ejectOnRightS1 #gold ore
+beq itemHash  1758427767 ejectOnRightS1 #iron ore
+beq itemHash  -190236170 ejectOnRightS1 #lead ore
+beq itemHash  1830218956 ejectOnRightS1 #nickel ore
+beq itemHash  1103972403 ejectOnRightS1 #silicon ore
+beq itemHash  -916518678 ejectOnRightS1 #silver ore
 # Item was not reqognized as meltable ore, so we it will ejected on the left output slot
 sbn sorterHash nameSorterS1 Output 1 # 1 = left output slot.
 j ra
 
 # Right: field of view towards outputs
-outputRightS1:
+ejectOnRightS1:
 sbn sorterHash nameSorterS1 Output 0 # 0 = right output slot.
 j ra
