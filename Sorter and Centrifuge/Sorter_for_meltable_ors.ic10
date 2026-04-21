@@ -1,0 +1,39 @@
+##########################################################################################
+# All direct meltable ores where sorted out and
+# put out on right output slot. All non-meltable
+# ores where put out on left slot. The ores where
+# detected using there hash vales.
+##########################################################################################
+define sorterHash -1009150565
+define nameSorterS1 HASH("SORTER_1")
+
+alias occupienceStateS1 r0
+alias itemHash r1 # stores hash of input item
+
+sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
+
+main:
+yield
+# load occupience from slot 0 (input) of sorter
+lbns occupienceStateS1 sorterHash nameSorterS1 0 Occupied Maximum
+# do processing if slot 0 (input) is occupied
+beqal occupienceStateS1 1 processingS1
+j main
+
+processingS1:
+lbns itemHash sorterHash nameSorterS1 0 OccupantHash Maximum
+beq itemHash  -707307845 outputRightS1 #copper ore
+beq itemHash -1348105509 outputRightS1 #gold ore
+beq itemHash  1758427767 outputRightS1 #iron ore
+beq itemHash  -190236170 outputRightS1 #lead ore
+beq itemHash  1830218956 outputRightS1 #nickel ore
+beq itemHash  1103972403 outputRightS1 #silicon ore
+beq itemHash  -916518678 outputRightS1 #silver ore
+# Item was not reqognized as meltable ore, so we it will ejected on the left output slot
+sbn sorterHash nameSorterS1 Output 1 # 1 = left output slot.
+j ra
+
+# Right: field of view towards outputs
+outputRightS1:
+sbn sorterHash nameSorterS1 Output 0 # 0 = right output slot.
+j ra
