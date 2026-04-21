@@ -6,12 +6,17 @@
 # We get a weather warning around 660 seconds
 # before strom.
 ##################################################
-alias timeToStorm r0 # in seconds
-alias speakerIsPlaying r1 # 1 = isPlaying
-alias activateBtn r2 # for debugging
 define wStaHash 1997212478 #weather station hash
 define flashLightHash -1535893860 # flash ligth hash
 define speakerHash -828056979 #Klaxon speaker hash
+
+define displayName HASH("TIME_TO_STORM")
+define displayHash -1949054743 #large display
+
+alias timeToStorm r0 # in seconds
+alias speakerIsPlaying r1 # 1 = isPlaying
+alias activateBtn r2 # for debugging
+
 # just for speaker testing. Set On to 1.
 sb speakerHash Mode 0 #for alarm
 sb speakerHash On 0
@@ -30,6 +35,8 @@ lb timeToStorm wStaHash NextWeatherEventTime Minimum
 round timeToStorm timeToStorm
 # display time to storm on a display
 s db Setting timeToStorm
+sbn displayHash displayName Mode 7
+sbn displayHash displayName Setting timeToStorm
 
 # deactive alarm if time no storm is comming
 beqz timeToStorm deactiveAlarm # equal 0

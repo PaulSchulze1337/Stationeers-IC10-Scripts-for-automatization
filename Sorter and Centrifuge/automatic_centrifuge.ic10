@@ -1,0 +1,75 @@
+##########################################################################################
+# This script controlls a centrifuge.
+# - The Centrigue is allways turned on.
+# - It will perform an eject, when a amount of items is in the output slot
+#   and no item is in the input slot.
+##########################################################################################
+define centrifugeHash 690945935 # Centrifuge
+define nameCentrifugeC1 HASH("CENTRIFUGE_1")
+define nameCentrifugeC2 HASH("CENTRIFUGE_2")
+define nameCentrifugeC3 HASH("CENTRIFUGE_3")
+define EJECTTHRESHOLD 15 # 400 is the max stack size
+
+alias currentCapacityC1 r0
+alias currentCapacityC2 r1
+alias currentCapacityC3 r2
+alias isEjectingC1 r3
+alias isEjectingC2 r4
+alias isEjectingC3 r5
+move isEjectingC1 0
+move isEjectingC2 0
+move isEjectingC3 0
+alias readFromCentrifuge r15 # debug value
+
+main:
+yield
+# reads output and input slot of centrifuge
+lbn currentCapacityC1 centrifugeHash nameCentrifugeC1 Reagents Maximum
+lbn currentCapacityC2 centrifugeHash nameCentrifugeC2 Reagents Maximum
+lbn currentCapacityC3 centrifugeHash nameCentrifugeC3 Reagents Maximum
+s db Setting isEjectingC1 # show on IC
+bleal EJECTTHRESHOLD currentCapacityC1 EjectFromCentrifugeC1
+bleal EJECTTHRESHOLD currentCapacityC2 EjectFromCentrifugeC2
+bleal EJECTTHRESHOLD currentCapacityC3 EjectFromCentrifugeC3
+beqal isEjectingC1 1 CheckIfFinishedC1
+beqal isEjectingC2 1 CheckIfFinishedC2
+beqal isEjectingC3 1 CheckIfFinishedC3
+
+j main
+
+EjectFromCentrifugeC1:
+move isEjectingC1 1
+sbn centrifugeHash nameCentrifugeC1 Open 1 # open centrifuge
+j ra
+
+EjectFromCentrifugeC2:
+move isEjectingC2 1
+sbn centrifugeHash nameCentrifugeC2 Open 1 # open centrifuge
+j ra
+
+EjectFromCentrifugeC3:
+move isEjectingC3 1
+sbn centrifugeHash nameCentrifugeC3 Open 1 # open centrifuge
+j ra
+
+
+CheckIfFinishedC1:
+bge currentCapacityC1 5 ra # still not empty, wait
+# from here we know that centrifuge is empty and should be closed again
+move isEjectingC1 0
+sbn centrifugeHash nameCentrifugeC1 Open 0 # close centrifuge
+j ra
+
+CheckIfFinishedC2:
+bge currentCapacityC2 5 ra # still not empty, wait
+# from here we know that centrifuge is empty and should be closed again
+move isEjectingC2 0
+sbn centrifugeHash nameCentrifugeC2 Open 0 # close centrifuge
+j ra
+
+CheckIfFinishedC3:
+bge currentCapacityC3 5 ra # still not empty, wait
+# from here we know that centrifuge is empty and should be closed again
+move isEjectingC3 0
+sbn centrifugeHash nameCentrifugeC3 Open 0 # close centrifuge
+j ra
