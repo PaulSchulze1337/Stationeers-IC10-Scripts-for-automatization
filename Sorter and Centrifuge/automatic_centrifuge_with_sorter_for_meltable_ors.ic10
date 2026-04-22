@@ -1,0 +1,99 @@
+##########################################################################################
+# This script controlls multiple centrifuges and a sorter.
+##########################################################################################
+# Variables for centrifuge
+define centrifugeHash 690945935 # Centrifuge
+define nameCentrifugeC1 HASH("CENTRIFUGE_1")
+define nameCentrifugeC2 HASH("CENTRIFUGE_2")
+define nameCentrifugeC3 HASH("CENTRIFUGE_3")
+define EJECTTHRESHOLD 100 # 400 is the max stack size
+define STOPEJECTTHRESHOLD 5 # be aware, that amounts  < 1 kg of one ore can't be ejected!
+# Variables for sorter
+define sorterHash -1009150565
+define nameSorterS1 HASH("SORTER_1")
+# Init Centrifuge
+alias currentCapacityC1 r0
+alias currentCapacityC2 r1
+alias currentCapacityC3 r2
+alias isEjectingC1 r3
+alias isEjectingC2 r4
+alias isEjectingC3 r5
+move isEjectingC1 0
+move isEjectingC2 0
+move isEjectingC3 0
+# Init Sorter
+alias occupienceStateS1 r0
+alias itemHash r15 # stores hash of input item
+sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
+
+main:
+yield
+# process centrifuges
+lbn currentCapacityC1 centrifugeHash nameCentrifugeC1 Reagents Maximum
+lbn currentCapacityC2 centrifugeHash nameCentrifugeC2 Reagents Maximum
+lbn currentCapacityC3 centrifugeHash nameCentrifugeC3 Reagents Maximum
+bleal EJECTTHRESHOLD currentCapacityC1 EjectFromCentrifugeC1
+bleal EJECTTHRESHOLD currentCapacityC2 EjectFromCentrifugeC2
+bleal EJECTTHRESHOLD currentCapacityC3 EjectFromCentrifugeC3
+beqal isEjectingC1 1 CheckIfFinishedC1
+beqal isEjectingC2 1 CheckIfFinishedC2
+beqal isEjectingC3 1 CheckIfFinishedC3
+# process sorter
+lbns occupienceStateS1 sorterHash nameSorterS1 0 Occupied Maximum
+beqal occupienceStateS1 1 processingS1 # do processing if slot 0 (input) is occupied
+j main
+
+EjectFromCentrifugeC1:
+move isEjectingC1 1
+sbn centrifugeHash nameCentrifugeC1 Open 1 # open centrifuge
+j ra
+
+EjectFromCentrifugeC2:
+move isEjectingC2 1
+sbn centrifugeHash nameCentrifugeC2 Open 1 # open centrifuge
+j ra
+
+EjectFromCentrifugeC3:
+move isEjectingC3 1
+sbn centrifugeHash nameCentrifugeC3 Open 1 # open centrifuge
+j ra
+
+CheckIfFinishedC1:
+bge currentCapacityC1 5 ra # still not empty, wait
+# from here we know that centrifuge is almost empty and should be closed again
+move isEjectingC1 0
+sbn centrifugeHash nameCentrifugeC1 Open 0 # close centrifuge
+j ra
+
+CheckIfFinishedC2:
+bge currentCapacityC2 5 ra # still not empty, wait
+# from here we know that centrifuge is almost empty and should be closed again
+move isEjectingC2 0
+sbn centrifugeHash nameCentrifugeC2 Open 0 # close centrifuge
+j ra
+
+CheckIfFinishedC3:
+bge currentCapacityC3 5 ra # still not empty, wait
+# from here we know that centrifuge is almost empty and should be closed again
+move isEjectingC3 0
+sbn centrifugeHash nameCentrifugeC3 Open 0 # close centrifuge
+j ra
+
+processingS1: # Sorter 1
+lbns itemHash sorterHash nameSorterS1 0 OccupantHash Maximum
+# List here all ores that shoukd be ejected on the right output slot.
+#beq itemHash  -707307845 ejectOnRightS1 #copper ore
+beq itemHash -1348105509 ejectOnRightS1 #gold ore
+#beq itemHash  1758427767 ejectOnRightS1 #iron ore
+#beq itemHash  -190236170 ejectOnRightS1 #lead ore
+#beq itemHash  1830218956 ejectOnRightS1 #nickel ore
+#beq itemHash  1103972403 ejectOnRightS1 #silicon ore
+#beq itemHash  -916518678 ejectOnRightS1 #silver ore
+# Item was not reqognized as meltable ore, so we it will ejected on the left output slot
+sbn sorterHash nameSorterS1 Output 1 # 1 = left output slot.
+j ra
+
+# Right: field of view towards outputs
+ejectOnRightS1: # Sorter 1
+sbn sorterHash nameSorterS1 Output 0 # 0 = right output slot.
+j ra
