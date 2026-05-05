@@ -30,9 +30,9 @@ alias pumpSettingN2 r7
 
 main:
 yield
-lbn currentRoomPressure -1252983604 HASH("AIR_SENSOR_WORKSHOP") Pressure Average # read pressure
-sbn -1129453144 HASH("VENT_WORKSHOP") PressureInternal 50000 # set vent internal press
-sbn -1129453144 HASH("VENT_WORKSHOP") Mode 1 # set vent to Inward
+lbn currentRoomPressure -1252983604 HASH("AIR_SENSOR_HABITAT") Pressure Average # read pressure
+sbn -1129453144 HASH("VENT_HABITAT") PressureInternal 50000 # set vent internal press
+sbn -1129453144 HASH("VENT_HABITAT") Mode 1 # set vent to Inward
 bgt currentRoomPressure MAXPRESSURE startVent # a > b
 bleal currentRoomPressure MINPRESSURE stopVent  # a <= b
 # Cut off if pressure is too high. There must be a failure in the filtration system
@@ -40,9 +40,9 @@ bgt currentRoomPressure MAXPRESSURE main  # a > b
 
 
 # calc partial pressure of O2
-lbn currentO2 -1252983604 HASH("AIR_SENSOR_WORKSHOP") RatioOxygen Average # read O2
-lbn currentCO2 -1252983604 HASH("AIR_SENSOR_WORKSHOP") RatioCarbonDioxide Average # read CO2
-lbn currentN2 -1252983604 HASH("AIR_SENSOR_WORKSHOP") RatioNitrogen Average # read N2
+lbn currentO2 -1252983604 HASH("AIR_SENSOR_HABITAT") RatioOxygen Average # read O2
+lbn currentCO2 -1252983604 HASH("AIR_SENSOR_HABITAT") RatioCarbonDioxide Average # read CO2
+lbn currentN2 -1252983604 HASH("AIR_SENSOR_HABITAT") RatioNitrogen Average # read N2
 mul partialPressureO2 currentRoomPressure currentO2
 ble partialPressureO2 16 fill02quick # a <= b 16 kPa is minimum to keep player alive
 
@@ -75,11 +75,11 @@ startVent:
 sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
 sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
 sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
-sbn -1129453144 HASH("VENT_WORKSHOP") On 1 # turns vent on
+sbn -1129453144 HASH("VENT_HABITAT") On 1 # turns vent on
 j main
 
 stopVent:
-sbn -1129453144 HASH("VENT_WORKSHOP") On 0 # turns vent off
+sbn -1129453144 HASH("VENT_HABITAT") On 0 # turns vent off
 sbn -321403609 HASH("PUMP_OXYGEN") On 0 # turn off
 sbn -321403609 HASH("PUMP_CO2") On 0 # turn off
 sbn -321403609 HASH("PUMP_NITROGEN") On 0 # turn off
