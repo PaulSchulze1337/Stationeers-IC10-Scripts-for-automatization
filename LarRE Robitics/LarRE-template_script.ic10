@@ -1,6 +1,6 @@
 ##################################################################################
 # Basis script to control a LarRE robots arm in Stationeers.                     #
-# Use this as a template. It moves the arm to each station  and back to the base.#                                                  #
+# Use this as a template. It moves the arm to each station  and back to the base.#
 ##################################################################################
 # - Name your LarRe "LARRE_1" like the variable 'larreName' below                #
 # - add the correct hash value to your type of LarRE                             #
