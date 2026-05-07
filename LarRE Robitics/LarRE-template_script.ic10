@@ -1,48 +1,47 @@
-##########################################################################
-# Basis script to control a LarRE robots arm in Stationeers.             #
-# Use this as a template. It basically moves the arm to each station     #
-# and back to the base.                                                  #
-##########################################################################
-# - Name your LarRe "LARRE_1" like the variable 'larreName' below        #
-# - add the correct hash value to your type of LarRE                     #
-# - set the number of stations you have in your setup                    #
-##########################################################################
+##################################################################################
+# Basis script to control a LarRE robots arm in Stationeers.                     #
+# Use this as a template. It moves the arm to each station  and back to the base.#                                                  #
+##################################################################################
+# - Name your LarRe "LARRE_1" like the variable 'larreName' below                #
+# - add the correct hash value to your type of LarRE                             #
+# - set the number of stations you have in your setup                            #
+##################################################################################
 ### SETUP ###
-define larreName HASH("LARRE_1")
-define larreHash 85133079 # hash value for Hydroponics LarRE
-define numberOfStations 4
-define harvestTimer 30 # perfrom harvest every 30 seconds
+    define larreName HASH("LARRE_1")
+    define larreHash 85133079 # hash value for Hydroponics LarRE
+    define numberOfStations 4
+    define harvestTimer 30 # perfrom harvest every 30 seconds
 ### VARIABLES ###
-alias currentSlot r1
-alias currentTime r2
-alias idleState r15
-move currentSlot numberOfStations # set highest station number as start
+    alias currentSlot r1
+    alias currentTime r2
+    alias idleState r15
+    move currentSlot numberOfStations # set highest station number as start
 
 main:
-yield
-add currentTime currentTime 0.5
-s db Setting currentTime
-bge currentTime harvestTimer moveToNextStation
-j main
+    yield
+    add currentTime currentTime 0.5
+    s db Setting currentTime
+    bge currentTime harvestTimer moveToNextStation
+    j main
 
 moveToNextStation:
-sub currentSlot currentSlot 1 # next station is -1  from current station
-sbn larreHash larreName On 1
-sbn larreHash larreName Setting currentSlot
-jal waitTillIdle
-beq currentSlot 0 moveToBase
-j moveToNextStation
+    sub currentSlot currentSlot 1 # next station is -1  from current station
+    sbn larreHash larreName On 1
+    sbn larreHash larreName Setting currentSlot
+    jal waitTillIdle
+    beq currentSlot 0 moveToBase
+    j moveToNextStation
 
 moveToBase:
-sbn larreHash larreName Setting numberOfStations
-jal waitTillIdle
-move currentSlot numberOfStations # reset to start
-move currentTime 0 # reset timer
-j main
+    sbn larreHash larreName Setting numberOfStations
+    jal waitTillIdle
+    move currentSlot numberOfStations # reset to start
+    move currentTime 0 # reset timer
+    j main
 
 # Loop to wait till the robot is idle, then perform next action
 waitTillIdle:
-yield
-lbn idleState larreHash larreName Idle 0
-beq idleState 0 waitTillIdle
-j ra
+    yield
+    lbn idleState larreHash larreName Idle 0
+    beq idleState 0 waitTillIdle
+    j ra
