@@ -11,7 +11,7 @@
 define larreName HASH("LARRE_1")
 define larreHash 85133079 # hash value for Hydroponics LarRE
 define numberOfStations 4
-define harvestTimer 10 # perfrom harvest every 30 seconds
+define harvestTimer 30 # perfrom harvest every 30 seconds
 ### VARIABLES ###
 alias currentSlot r1
 alias currentTime r2
@@ -20,7 +20,7 @@ move currentSlot numberOfStations # set highest station number as start
 
 main:
 yield
-add currentTime currentTime 1
+add currentTime currentTime 0.5
 s db Setting currentTime
 bge currentTime harvestTimer moveToNextStation
 j main
