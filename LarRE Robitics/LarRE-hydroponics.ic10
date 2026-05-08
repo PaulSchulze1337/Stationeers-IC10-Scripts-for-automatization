@@ -1,0 +1,70 @@
+##################################################################################
+# Very simple script to control a LarRE hydroponics robots arm in Stationeers.   #
+# Note: This script is only working for perennial crops like tomatos.            #
+# Pre-requisites:                                                                #
+#  - plant tomatos or other perennial crops in each hydroponics tray             #
+##################################################################################
+### SETUP ###
+define larreName HASH("LARRE_1")
+define hopperName HASH("HOPPER_1")
+define larreHash 85133079 # hash value for Hydroponics LarRE
+define hopperHash -850484480
+define numberOfStations 4
+define harvestTimer 120 # perfrom harvest every 120 seconds
+### VARIABLES ###
+alias currentSlot r1
+alias currentTime r2
+alias matureState r14
+alias idleState r15
+move currentSlot numberOfStations # set highest station number as start
+
+main:
+yield
+add currentTime currentTime 1
+s db Setting currentTime
+bge currentTime harvestTimer moveToNextStation
+j main
+
+moveToNextStation:
+sub currentSlot currentSlot 1 # next station is -1  from current station
+sbn larreHash larreName On 1
+sbn larreHash larreName Setting currentSlot # move to station
+jal waitTillIdle
+beq currentSlot 0 dropHarvest
+checkForHarvest:
+lbns matureState larreHash larreName 255 Mature Maximum
+beq matureState 1 harvest
+j moveToNextStation
+harvest:
+sbn larreHash larreName Activate 1 # moves the arm down
+jal waitTillIdle
+sbn larreHash larreName Open 1
+# check if these is still some crop left to harvest
+lbns matureState larreHash larreName 255 Mature Maximum
+beq matureState 1 harvest
+# if not, close the arm and move to next station
+j moveToNextStation
+
+dropHarvest:
+sbn larreHash larreName Activate 1 # moves the arm down
+jal waitTillIdle
+sbn larreHash larreName Open 1
+jal waitTillIdle
+sbn hopperHash hopperName On 1
+sbn hopperHash hopperName Open 0 # close hopper
+yield
+sbn hopperHash hopperName Open 1 # open hopper
+sbn hopperHash hopperName On 0
+moveToBase:
+sbn larreHash larreName Setting numberOfStations
+jal waitTillIdle
+move currentSlot numberOfStations # reset to start
+move currentTime 0 # reset timer
+j main
+
+# Loop to wait till the robot is idle, then perform next action
+waitTillIdle:
+yield
+lbn idleState larreHash larreName Idle 0
+beq idleState 0 waitTillIdle
+j ra
