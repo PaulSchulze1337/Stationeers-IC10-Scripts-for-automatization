@@ -19,22 +19,19 @@ move currentSlot 0 # set lowest station number as start
 alias currentTime r2
 move currentTime 0 # init timer
 alias currentHavestCycle r11 # to prevent stuck in harvesting loop
-alias hopperContent r12
+alias larreStorage r12
 alias cropState r13 # used for Seeding and Mature state of the crop
-alias operationMode r14 # 0 = collecting crops, 1 = collecting seeds
-move operationMode 1 # start with collecting seeds
+alias operationMode r14 # 0 = collecting seeds, 1 = collecting crops
+move operationMode 0 # start with collecting seeds
 alias idleState r15
 
 main:
 yield
 add currentTime currentTime 1
 #s db Setting currentTime
-bge currentTime runTimer prepareForHarvest
+bge currentTime runTimer moveToNextStation
 j main
 
-prepareForHarvest:
-# invert operation mode to switch between collecting seeds and crops
-xor operationMode operationMode 1
 moveToNextStation:
 add currentSlot currentSlot 1 # next station is +1  from current station
 move currentHavestCycle 0 # reset harvest cycle counter
@@ -42,7 +39,7 @@ sbn larreHash larreName On 1
 sbn larreHash larreName Setting currentSlot # move to station
 jal waitTillIdle
 beq currentSlot dropStationNr dropHarvest # drop everything at the last station
-beq operationMode 0 checkForCrop
+beq operationMode 1 checkForCrop
 checkForSeeds:
 lbns cropState larreHash larreName 255 Seeding Maximum
 s db Setting cropState
@@ -50,6 +47,7 @@ bne cropState 1 moveToNextStation
 sbn larreHash larreName Activate 1 # moves the arm down
 jal waitTillIdle
 sbn larreHash larreName Open 1 # open arm to collect seeds
+jal waitTillIdle
 j moveToNextStation
 
 checkForCrop:
@@ -60,6 +58,7 @@ harvest:
 sbn larreHash larreName Activate 1 # moves the arm down
 jal waitTillIdle
 sbn larreHash larreName Open 1 # open arm to collect crops
+jal waitTillIdle
 add currentHavestCycle currentHavestCycle 1
 bgt currentHavestCycle 5 moveToNextStation # prevent getting stuck in harvesting
 # check if these is still some crop left to harvest
@@ -78,11 +77,13 @@ sbn hopperHash hopperName Open 0 # close hopper
 yield
 sbn hopperHash hopperName Open 1 # open hopper
 sbn hopperHash hopperName On 0
-lbns hopperContent hopperHash hopperName 1 Occupied Maximum
-bgt hopperContent 0 dropHarvest # if there is still something in the hopper
+lbns larreStorage larreHash larreName 0 Occupied Maximum
+bgt larreStorage 0 dropHarvest # if there is still something in the hopper
 moveToBase:
 sbn larreHash larreName Setting startStationNr
 jal waitTillIdle
+# invert operation mode for the next run (first run keeps initial seed mode)
+xor operationMode operationMode 1
 move currentSlot 0 # reset to start
 move currentTime 0 # reset timer
 j main
