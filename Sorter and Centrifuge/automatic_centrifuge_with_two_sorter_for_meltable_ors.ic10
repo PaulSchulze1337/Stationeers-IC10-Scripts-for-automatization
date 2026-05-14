@@ -26,11 +26,12 @@ move isEjectingC3 0
 alias occupienceStateS1 r6
 alias occupienceStateS2 r7
 alias itemHash r15 # stores hash of input item
-sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
-sbn sorterHash nameSorterS2 Mode 2 # switch to logic mode: no auto eject
+
 
 main:
 yield
+sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
+sbn sorterHash nameSorterS2 Mode 2 # switch to logic mode: no auto eject
 # process centrifuges
 lbn currentCapacityC1 centrifugeHash nameCentrifugeC1 Reagents Maximum
 lbn currentCapacityC2 centrifugeHash nameCentrifugeC2 Reagents Maximum

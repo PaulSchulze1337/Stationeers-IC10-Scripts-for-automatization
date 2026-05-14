@@ -3,7 +3,7 @@
 # All direct meltable ores where sorted out and put out on right output slot.
 # All non-meltable ores where put out on left slot.
 # The ores where detected using there hash vales.
-# The script can be early adapted to controll more than one sorter.
+# The script can be easily adapted controll more than one sorter
 ##########################################################################################
 define sorterHash -1009150565
 define nameSorterS1 HASH("SORTER_1")
@@ -11,10 +11,10 @@ define nameSorterS1 HASH("SORTER_1")
 alias occupienceStateS1 r0
 alias itemHash r15 # stores hash of input item
 
-sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
 
 main:
 yield
+sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
 # load occupience from slot 0 (input) of sorter
 lbns occupienceStateS1 sorterHash nameSorterS1 0 Occupied Maximum
 beqal occupienceStateS1 1 processingS1 # do processing if slot 0 (input) is occupied

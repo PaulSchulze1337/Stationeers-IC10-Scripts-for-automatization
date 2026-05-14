@@ -1,0 +1,53 @@
+##########################################################################################
+# This Script controlles a sorter (NOT a Logic Sorter!).
+# All direct meltable ores where sorted out and put out on right output slot.
+# All non-meltable ores where put out on left slot.
+# The ores where detected using there hash vales.
+# The script can be easily adapted controll more than one sorter
+##########################################################################################
+define sorterHash -1009150565
+define nameSorterS1 HASH("SORTER_1")
+
+alias occupienceStateS1 r0
+alias itemHash r15 # stores hash of input item
+
+
+main:
+yield
+sbn sorterHash nameSorterS1 Mode 2 # switch to logic mode: no auto eject
+# load occupience from slot 0 (input) of sorter
+lbns occupienceStateS1 sorterHash nameSorterS1 0 Occupied Maximum
+beqal occupienceStateS1 1 processingS1 # do processing if slot 0 (input) is occupied
+j main
+
+processingS1:
+lbns itemHash sorterHash nameSorterS1 0 OccupantHash Maximum
+s db Setting itemHash
+beq itemHash -654756733 ejectOnLeftS1  #wheat seeds
+beq itemHash 315264172 ejectOnLeftS1   #watermelon seeds
+beq itemHash -1922066841 ejectOnLeftS1 #tomato seeds
+beq itemHash 488360169 ejectOnLeftS1   #switchgrass seeds
+beq itemHash -1884103228 ejectOnLeftS1 #sugarcane seeds
+beq itemHash 2009884607 ejectOnLeftS1  #strawberry seeds
+beq itemHash 1783004244 ejectOnLeftS1  #soybean seeds
+beq itemHash -1691151239 ejectOnLeftS1 #rice seeds
+beq itemHash 1423199840 ejectOnLeftS1  #pumpkin seeds
+beq itemHash 1005571172 ejectOnLeftS1  #potato seeds
+beq itemHash 311593418 ejectOnLeftS1   #mushroom seeds
+beq itemHash -1066145654 ejectOnLeftS1 #Hades seeds (Alpha strain)
+beq itemHash -969228551 ejectOnLeftS1  #Hades seeds (Beta strain)
+beq itemHash -1990600883 ejectOnLeftS1 #fern seeds
+beq itemHash 980397232 ejectOnLeftS1   #darga fern seeds
+beq itemHash -969228551 ejectOnLeftS1  #corn fern seeds
+beq itemHash 1139887531 ejectOnLeftS1  #cocoa fern seeds
+beq itemHash 897717596 ejectOnLeftS1   #blueberry fern seeds
+beq itemHash -1740754636 ejectOnLeftS1 #winterspeed seeds (Alpha strain)
+beq itemHash -475065916 ejectOnLeftS1  #winterspeed seeds (Beta strain)
+# Item was not reqognized as meltable ore, so we it will ejected on the left output slot
+sbn sorterHash nameSorterS1 Output 0 # 1 = right output slot.
+j ra
+
+# Right: field of view towards outputs
+ejectOnLeftS1:
+sbn sorterHash nameSorterS1 Output 1 # 0 = left output slot.
+j ra
